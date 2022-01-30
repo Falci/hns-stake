@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "pm2 start && pm2 monit"
+  },
+  "devDependencies": {
+    "pm2": "^5.1.2"
+  }
+}

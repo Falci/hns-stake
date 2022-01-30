@@ -1,0 +1,6 @@
+query wallet {
+  wallet {
+    address
+    balance
+  }
+}
