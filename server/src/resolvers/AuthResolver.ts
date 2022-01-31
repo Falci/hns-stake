@@ -5,10 +5,10 @@ import Account from 'models/Account';
 
 @ObjectType()
 class LoginSession {
-  @Field(() => Account)
+  @Field()
   account: Account;
 
-  @Field(() => String)
+  @Field()
   token: string;
 
   constructor(auth: Auth) {

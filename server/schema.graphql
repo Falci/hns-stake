@@ -4,10 +4,8 @@
 # -----------------------------------------------
 
 type Account {
-  address: String!
   balance: Float!
   id: ID!
-  index: Float!
 }
 
 type LoginSession {

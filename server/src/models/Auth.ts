@@ -1,14 +1,14 @@
+import crypto from 'crypto';
+import { Field, ID, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ObjectType, Field, ID } from 'type-graphql';
 import Account from './Account';
-import crypto from 'crypto';
 
 @Entity('auth')
 @ObjectType()
@@ -17,19 +17,19 @@ export default class Auth extends BaseEntity {
   @Field(() => ID)
   id: string;
 
-  @OneToOne(() => Account)
-  @JoinColumn()
+  @ManyToOne(() => Account)
+  @JoinColumn([{ name: 'account_id', referencedColumnName: 'id' }])
   account: Account;
 
-  @Field(() => String)
+  @Field()
   @Column()
   provider: 'local';
 
-  @Field(() => String)
+  @Field()
   @Column()
   providerId: string;
 
-  @Field(() => String)
+  @Field()
   @Column()
   token: string;
 

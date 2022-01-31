@@ -1,21 +1,26 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ObjectType, Field, ID } from 'type-graphql';
+import Address from './Address';
 
-@Entity('accunt')
+@Entity('account')
 @ObjectType()
 export default class Account extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)
   id: string;
 
-  @Field(() => String)
-  @Column({ unique: true })
-  address: string;
-  @Field(() => Number)
-  @Column()
-  index: number;
-
-  @Field(() => Number)
+  @Field()
   @Column('float')
-  balance: number;
+  balance: number = 0;
+
+  @OneToOne(() => Address, (addr) => addr.account)
+  address: Address;
 }
