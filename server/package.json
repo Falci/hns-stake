@@ -5,10 +5,12 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only --ignore-watch node_modules --no-notify src/server.ts",
+    "start:ws": "ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only --ignore-watch node_modules --no-notify src/hsd.ts",
     "build": "babel src --extensions \".ts\" --out-dir dist --copy-files --no-copy-ignored",
     "test": "jest",
     "typeorm": "ts-node node_modules/typeorm/cli.js",
     "docker:db:start": "docker run -d --name hns-stake-db -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=hns-stake -p 5432:5432 postgres:10.15",
+    "docker:hsd:start": "docker run --name hsd -p 14037:14037 -p 14039:14039 sinpapeles/hsd:2.4.0 --network regtest --http-host 0.0.0.0 --api-key=api-key --wallet-http-host=0.0.0.0",
     "db:seed": "NODE_PATH=./src ts-node -r dotenv/config src/db/seed.ts"
   },
   "devDependencies": {
@@ -18,6 +20,7 @@
     "@babel/preset-env": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
     "@types/body-parser": "^1.19.2",
+    "@types/debug": "^4.1.7",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.0",
     "@types/jsonwebtoken": "^8.5.8",
@@ -41,8 +44,10 @@
     "body-parser": "^1.19.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "debug": "^4.3.3",
     "express": "^4.17.2",
     "graphql": "^15.3.0",
+    "hs-client": "^0.0.10",
     "hsd": "^3.0.1",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.1",
