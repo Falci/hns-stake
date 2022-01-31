@@ -1,13 +1,11 @@
+import { Field, ID, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   Column,
   Entity,
-  ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ObjectType, Field, ID } from 'type-graphql';
 import Address from './Address';
 
 @Entity('account')

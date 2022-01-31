@@ -43,7 +43,10 @@ export class AuthResolver {
   static parseToken(token: string | undefined) {
     try {
       // TODO: return a account from DB
-      const { account } = jwt.verify(token, process.env.AUTH_TOKEN_SECRET) as {
+      const { account } = jwt.verify(
+        token!,
+        process.env.AUTH_TOKEN_SECRET!
+      ) as {
         account: Account;
       };
 

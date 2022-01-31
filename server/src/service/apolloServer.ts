@@ -1,15 +1,14 @@
-import { Express, Router, Request, Response } from 'express';
+import { ContextFunction } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
-
+import { Express } from 'express';
 import authChecker from 'middleware/authChecker';
-import 'reflect-metadata';
 import { AuthResolver } from 'resolvers/AuthResolver';
+import { SettingsResolver } from 'resolvers/SettingsResolver';
 import { WalletResolver } from 'resolvers/WalletResolver';
 import { buildSchema } from 'type-graphql';
-import { ContextFunction } from 'apollo-server-core';
 
 const schema = buildSchema({
-  resolvers: [AuthResolver, WalletResolver],
+  resolvers: [AuthResolver, SettingsResolver, WalletResolver],
   authChecker,
   emitSchemaFile: 'schema.graphql',
 });

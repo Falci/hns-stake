@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import Express from 'express';
-import apolloServer from './apolloServer';
+import apolloServer from './service/apolloServer';
 import './db/connect';
 
 const app = Express();

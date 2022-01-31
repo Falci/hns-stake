@@ -5,6 +5,7 @@ import Address from 'models/Address';
 import Auth from 'models/Auth';
 
 import conn from 'db/connect';
+import Settings from 'models/Settings';
 
 (async () => {
   await conn;
@@ -12,6 +13,8 @@ import conn from 'db/connect';
   await Address.delete({});
   await Auth.delete({});
   await Account.delete({});
+
+  await Settings.setCurrentHeight(0);
 
   const account = new Account();
   await account.save();

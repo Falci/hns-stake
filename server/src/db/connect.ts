@@ -3,6 +3,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import Auth from 'models/Auth';
 import Account from 'models/Account';
 import Address from 'models/Address';
+import Settings from 'models/Settings';
 
 export default createConnection({
   namingStrategy: new SnakeNamingStrategy(),
@@ -13,7 +14,7 @@ export default createConnection({
   username: process.env.TYPEORM_USERNAME as string,
   password: process.env.TYPEORM_PASSWORD as string,
   database: process.env.TYPEORM_DATABASE as string,
-  entities: [Account, Auth, Address],
+  entities: [Account, Auth, Address, Settings],
   synchronize: process.env.NODE_ENV !== 'production',
   logging: false,
 }).then(() => console.log('💾 Connected to database!'));
