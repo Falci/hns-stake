@@ -1,6 +1,6 @@
 import { ApolloError } from '@apollo/client';
 import React from 'react';
-
+import AlertError from './alert/Error';
 export type LoaderChild<T> = React.FC<{ data: T | undefined }>;
 
 interface Props<T> {
@@ -12,11 +12,7 @@ interface Props<T> {
 
 function Loader<T>({ loading, error, data, children }: Props<T>): JSX.Element {
   if (error) {
-    return (
-      <div>
-        <span>{error.message}</span>
-      </div>
-    );
+    return <AlertError>{error.message}</AlertError>;
   }
 
   if (loading) {
