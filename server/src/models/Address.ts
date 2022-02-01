@@ -1,7 +1,15 @@
 import { generateAddress } from 'service/hsd';
 import { Field, ObjectType } from 'type-graphql';
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
 import Account from './Account';
+import BalanceMemPool from './BalanceMemPool';
 
 @Entity('address')
 @ObjectType()
@@ -20,6 +28,9 @@ export default class Address extends BaseEntity {
   @Field()
   @Column()
   used: boolean = false;
+
+  @OneToMany(() => BalanceMemPool, (tx) => tx.address)
+  mempool: BalanceMemPool[];
 
   static async generateNext(account: Account): Promise<Address> {
     const lastAddr = await Address.findOne({ order: { index: 'DESC' } });

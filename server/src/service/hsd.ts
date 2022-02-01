@@ -1,13 +1,23 @@
+import Debug from 'debug';
 import Network from 'hsd/lib/protocol/network';
 import { NodeClient } from 'hs-client';
 import hd from 'hsd/lib/hd';
 import Address from 'hsd/lib/primitives/address';
+import BloomFilter from 'bfilter/lib/bloom';
+
+const debug = Debug('server:hsd');
 
 const network = Network.get();
 
 export const client = new NodeClient({
   port: network.rpcPort,
-  apiKey: 'api-key',
+  apiKey: process.env.HSD_API_KEY!,
+});
+
+client.on('error', (e) => debug(e));
+client.on('connect', () => {
+  debug('WS connected');
+  client.setFilter(new BloomFilter().encode());
 });
 
 const getNetwork = (key: string) =>

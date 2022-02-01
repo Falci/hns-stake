@@ -2135,7 +2135,7 @@ bfile@~0.2.1, bfile@~0.2.2:
   resolved "https://registry.yarnpkg.com/bfile/-/bfile-0.2.2.tgz#b0c205cee1ff22a9525304ec51f09195a7afa077"
   integrity sha512-X205SsJ7zFAnjeJ/pBLqDqF10x/4Su3pBy8UdVKw4hdGJk7t5pLoRi+uG4rPaDAClGbrEfT/06PGUbYiMYKzTg==
 
-bfilter@~1.0.5:
+bfilter@^1.0.5, bfilter@~1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/bfilter/-/bfilter-1.0.5.tgz#c1592e427f9c1f8be11b13bddd5f74fc2da56049"
   integrity sha512-GupIidtCvLbKhXnA1sxvrwa+gh95qbjafy7P1U1x/2DHxNabXq4nGW0x3rmgzlJMYlVl+c8fMxoMRIwpKYlgcQ==

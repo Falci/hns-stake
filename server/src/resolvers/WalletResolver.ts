@@ -1,5 +1,6 @@
 import Account from 'models/Account';
 import Address from 'models/Address';
+import BalanceMemPool from 'models/BalanceMempool';
 import {
   Authorized,
   Ctx,
@@ -16,6 +17,9 @@ class Wallet {
 
   @Field()
   balance?: number;
+
+  @Field()
+  mempool?: number;
 }
 
 @Resolver()
@@ -28,6 +32,12 @@ export class WalletResolver {
       .leftJoinAndMapOne('account.address', Address, 'addr', 'addr.used=false')
       .getOne();
 
+    const mempool = await BalanceMemPool.createQueryBuilder('mempool')
+      .innerJoin('mempool.address', 'addr')
+      .where('addr.account=:id', { id })
+      .select('SUM(mempool.value)', 'sum')
+      .getRawOne();
+
     if (!account) {
       throw new Error('Account not found');
     }
@@ -39,6 +49,7 @@ export class WalletResolver {
     return {
       address: account.address.address,
       balance: account.balance,
+      mempool: mempool.sum,
     };
   }
 }

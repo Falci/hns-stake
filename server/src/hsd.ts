@@ -5,10 +5,14 @@ import { client } from './service/hsd';
 import ChainEntry from 'hsd/lib/blockchain/chainentry';
 import TX from 'hsd/lib/primitives/tx';
 
+import memPoolSub from 'subscribers/MemPool';
+
+import 'db/connect';
+
 const debug = Debug('server:ws');
 
 (async () => {
-  await client.open();
+  await client.open().then(() => console.log('🤝 Connected to Handshake Node'));
   return () => client.close();
 })();
 
@@ -32,7 +36,5 @@ client.bind('chain connect', (raw: any) => {
 
 client.bind('tx', (raw: any) => {
   const tx = TX.fromRaw(raw);
-  thread('Charge.TX', async () =>
-    console.log(`do something with mempool tx`, tx)
-  );
+  memPoolSub.onTX(tx);
 });

@@ -22,4 +22,5 @@ type Query {
 type Wallet {
   address: String!
   balance: Float!
+  mempool: Float!
 }
