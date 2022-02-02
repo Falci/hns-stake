@@ -4,7 +4,7 @@ import Auth from 'models/Auth';
 import Account from 'models/Account';
 import Address from 'models/Address';
 import Settings from 'models/Settings';
-import BalanceMemPool from 'models/BalanceMempool';
+import BalanceMemPool from 'models/BalanceMemPool';
 
 export default createConnection({
   namingStrategy: new SnakeNamingStrategy(),
