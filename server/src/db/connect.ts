@@ -4,7 +4,8 @@ import Auth from 'models/Auth';
 import Account from 'models/Account';
 import Address from 'models/Address';
 import Settings from 'models/Settings';
-import BalanceMemPool from 'models/BalanceMemPool';
+import TxMempool from 'models/TxMempool';
+import TxMaturing from 'models/TxMaturing';
 
 export default createConnection({
   namingStrategy: new SnakeNamingStrategy(),
@@ -15,7 +16,7 @@ export default createConnection({
   username: process.env.TYPEORM_USERNAME as string,
   password: process.env.TYPEORM_PASSWORD as string,
   database: process.env.TYPEORM_DATABASE as string,
-  entities: [Account, Auth, Address, BalanceMemPool, Settings],
+  entities: [Account, Auth, Address, TxMempool, TxMaturing, Settings],
   synchronize: process.env.NODE_ENV !== 'production',
   logging: false,
 }).then(() => console.log('💾 Connected to database!'));

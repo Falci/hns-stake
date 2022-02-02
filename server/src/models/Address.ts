@@ -9,7 +9,8 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import Account from './Account';
-import BalanceMemPool from './BalanceMemPool';
+import TxMaturing from './TxMaturing';
+import TxMempool from './TxMempool';
 
 @Entity('address')
 @ObjectType()
@@ -29,8 +30,11 @@ export default class Address extends BaseEntity {
   @Column()
   used: boolean = false;
 
-  @OneToMany(() => BalanceMemPool, (tx) => tx.address)
-  mempool: BalanceMemPool[];
+  @OneToMany(() => TxMempool, (tx) => tx.address)
+  mempool: TxMempool[];
+
+  @OneToMany(() => TxMaturing, (tx) => tx.address)
+  maturing: TxMaturing[];
 
   static async generateNext(account: Account): Promise<Address> {
     const lastAddr = await Address.findOne({ order: { index: 'DESC' } });

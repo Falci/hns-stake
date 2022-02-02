@@ -15,9 +15,11 @@ export default class Account extends BaseEntity {
   @Field(() => ID)
   id: string;
 
-  @Field()
   @Column('float')
   balance: number = 0;
+
+  @Column('float')
+  unconfirmed: number = 0;
 
   @OneToOne(() => Address, (addr) => addr.account)
   address: Address;

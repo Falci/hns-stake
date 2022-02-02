@@ -1,6 +1,7 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -8,8 +9,12 @@ import {
 } from 'typeorm';
 import Address from './Address';
 
-@Entity('balance_mempool')
-export default class BalanceMemPool extends BaseEntity {
+/**
+ * This entity represets a transaction in mempool to an address in our database.
+ * [These entities are removed once they are confirmed]{@link TxMaturing#deleteMempool()}
+ */
+@Entity('tx_mempool')
+export default class TxMempool extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -25,4 +30,7 @@ export default class BalanceMemPool extends BaseEntity {
 
   @Column('float4')
   value: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

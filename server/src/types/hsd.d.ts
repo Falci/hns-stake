@@ -5,6 +5,30 @@ class Address {
 
 class Block {
   height: number;
+  confirmations: number;
+  difficulty: number;
+  hash: string;
+  tx: {
+    hash: string;
+    txid: string;
+    vin: {
+      coinbase: boolean;
+      txid: string;
+      vout: number;
+    }[];
+    vout: {
+      address: {
+        string: string;
+      };
+      covenant: {
+        action: 'NONE';
+        items: any[];
+        type: number;
+      };
+      value: number;
+      n: number;
+    }[];
+  }[];
   static fromRaw(raw: Buufer): Block;
 }
 
@@ -41,6 +65,7 @@ class Output {
 
 class TX {
   hash: () => Buffer;
+  txid: () => Buffer;
   mutable: boolean;
   version: number;
   inputs: Input[];
@@ -76,6 +101,7 @@ declare module 'hs-client' {
     close();
     on(event: string, callback: (e?: any) => void): void;
     setFilter(filter: Buffer);
+    execute(method: string, params?: any);
   }
 }
 

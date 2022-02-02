@@ -2,6 +2,6 @@ query wallet {
   wallet {
     address
     balance
-    mempool
+    unconfirmed
   }
 }

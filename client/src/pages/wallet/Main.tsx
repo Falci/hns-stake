@@ -17,7 +17,7 @@ const WalletPage: React.FC<RouteComponentProps> = () => {
             {(data) => (
               <div>
                 <div>Balance: {data?.wallet.balance}</div>
-                <div>Pending: {data?.wallet.mempool}</div>
+                <div>Pending: {data?.wallet.unconfirmed}</div>
                 <div>Deposit address: {data?.wallet.address}</div>
               </div>
             )}
