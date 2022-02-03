@@ -39,12 +39,15 @@ export class BlockSubscribe {
       .filter(({ address }) => ourAddrsPlain.includes(address))
       // save in `tx_maturing`
       .forEach((output) => {
-        TxMaturing.create({
-          ...output,
-          address: ourAddrs[output.address],
-          height: block.height,
-          goodAfter: block.height + 10, // TODO: create a better rule or use config
-        }).save();
+        TxMaturing.upsert(
+          {
+            ...output,
+            address: ourAddrs[output.address],
+            height: block.height,
+            goodAfter: block.height + 10, // TODO: create a better rule or use config
+          },
+          ['tx', 'index']
+        );
       });
   }
 }

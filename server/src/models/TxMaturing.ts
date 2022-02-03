@@ -1,15 +1,17 @@
 import {
   AfterInsert,
+  AfterRemove,
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  InsertEvent,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import Address from './Address';
-import TxMempool from './TxMempool';
 
 /**
  * This is a confirmed TX to an address in our database.
@@ -17,33 +19,55 @@ import TxMempool from './TxMempool';
  */
 @Entity('tx_maturing')
 export default class TxMaturing extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryColumn('char', { length: 64 })
+  tx: string;
+
+  @PrimaryColumn()
+  index: number;
 
   @ManyToOne(() => Address, (addr) => addr.maturing)
   @JoinColumn({ name: 'address' })
   address: Address;
 
-  @Column('char', { length: 64 })
-  tx: string;
-
-  @Column()
-  index: number;
-
   @Column('float4')
   value: number;
 
-  @Column()
+  @Column({ default: -1 })
   height: number;
 
-  @Column()
+  @Column({ default: -1 })
   goodAfter: number;
 
   @CreateDateColumn()
   createdAt: Date;
 
+  @UpdateDateColumn()
+  updatedAt: Date;
+
   @AfterInsert()
-  async deleteMempool() {
-    return await TxMempool.delete({ tx: this.tx });
+  @AfterRemove()
+  async updateUnconfirmedBalance() {
+    // find the account by the addr
+    const addr = await Address.findOne({
+      where: { address: this.address.address },
+      relations: ['account'],
+    });
+
+    // hate ts
+    if (!addr) {
+      throw new Error(`Couldn't find the account`);
+    }
+
+    const { account } = addr;
+
+    // sum all TxMaturing in this account (via addr)
+    const { total } = await Address.createQueryBuilder('addr')
+      .select('SUM(tx.value)', 'total')
+      .innerJoin('addr.maturing', 'tx')
+      .where('addr.account=:account', { account: account?.id })
+      .getRawOne();
+
+    account.unconfirmed = total;
+    await account.save();
   }
 }

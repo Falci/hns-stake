@@ -1,6 +1,6 @@
 import TX from 'hsd/lib/primitives/tx';
 import Address from 'models/Address';
-import TxMempool from 'models/TxMempool';
+import TxMaturing from 'models/TxMaturing';
 
 export class MemPoolSubscribe {
   onTX(tx: TX) {
@@ -12,7 +12,7 @@ export class MemPoolSubscribe {
         });
 
         if (address) {
-          await TxMempool.create({
+          await TxMaturing.create({
             tx: tx.hash().toString('hex'),
             index,
             value: output.value / 1e6,

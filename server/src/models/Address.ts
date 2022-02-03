@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import Account from './Account';
 import TxMaturing from './TxMaturing';
-import TxMempool from './TxMempool';
 
 @Entity('address')
 @ObjectType()
@@ -29,9 +28,6 @@ export default class Address extends BaseEntity {
   @Field()
   @Column()
   used: boolean = false;
-
-  @OneToMany(() => TxMempool, (tx) => tx.address)
-  mempool: TxMempool[];
 
   @OneToMany(() => TxMaturing, (tx) => tx.address)
   maturing: TxMaturing[];
