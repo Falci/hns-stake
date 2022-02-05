@@ -2,8 +2,14 @@ import Address from 'models/Address';
 import TxMaturing from 'models/TxMaturing';
 
 export class BlockSubscribe {
-  // TODO: this method could have some logs
   async onBlock(block: Block) {
+    this.populateTxMaturing(block);
+
+    TxMaturing.mature(block.height);
+  }
+
+  // TODO: this method could have some logs
+  private async populateTxMaturing(block: Block) {
     // TX NONE from the block
     const transfers = block.tx.flatMap((t) =>
       t.vout

@@ -1,17 +1,17 @@
 import {
-  AfterInsert,
-  AfterRemove,
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
-  InsertEvent,
   JoinColumn,
+  LessThanOrEqual,
   ManyToOne,
+  MoreThan,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import Address from './Address';
+import Tx from './Tx';
 
 /**
  * This is a confirmed TX to an address in our database.
@@ -44,30 +44,21 @@ export default class TxMaturing extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @AfterInsert()
-  @AfterRemove()
-  async updateUnconfirmedBalance() {
-    // find the account by the addr
-    const addr = await Address.findOne({
-      where: { address: this.address.address },
-      relations: ['account'],
+  static async mature(height: number) {
+    const mature = await TxMaturing.find({
+      where: { goodAfter: LessThanOrEqual(height), height: MoreThan(-1) },
+      relations: ['address'],
     });
 
-    // hate ts
-    if (!addr) {
-      throw new Error(`Couldn't find the account`);
-    }
-
-    const { account } = addr;
-
-    // sum all TxMaturing in this account (via addr)
-    const { total } = await Address.createQueryBuilder('addr')
-      .select('SUM(tx.value)', 'total')
-      .innerJoin('addr.maturing', 'tx')
-      .where('addr.account=:account', { account: account?.id })
-      .getRawOne();
-
-    account.unconfirmed = total;
-    await account.save();
+    mature.forEach(async (tx) => {
+      await Tx.create({
+        tx: tx.tx,
+        index: tx.index,
+        address: tx.address,
+        value: tx.value,
+        height: tx.height,
+      }).save();
+      await tx.remove();
+    });
   }
 }

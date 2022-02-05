@@ -5,6 +5,8 @@ import Account from 'models/Account';
 import Address from 'models/Address';
 import Settings from 'models/Settings';
 import TxMaturing from 'models/TxMaturing';
+import Tx from 'models/Tx';
+import { TxMaturingSubsscriber } from 'subscribers/TxMaturingSubscriber';
 
 export default createConnection({
   namingStrategy: new SnakeNamingStrategy(),
@@ -15,7 +17,8 @@ export default createConnection({
   username: process.env.TYPEORM_USERNAME as string,
   password: process.env.TYPEORM_PASSWORD as string,
   database: process.env.TYPEORM_DATABASE as string,
-  entities: [Account, Auth, Address, TxMaturing, Settings],
+  entities: [Account, Auth, Address, TxMaturing, Tx, Settings],
+  subscribers: [TxMaturingSubsscriber],
   synchronize: process.env.NODE_ENV !== 'production',
   logging: false,
 }).then(() => console.log('💾 Connected to database!'));
