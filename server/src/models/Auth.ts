@@ -1,36 +1,43 @@
 import crypto from 'crypto';
-import { Field, ID, ObjectType } from 'type-graphql';
 import {
-  BaseEntity,
+  AutoIncrement,
+  BelongsTo,
   Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript';
+import { Field, ID, ObjectType } from 'type-graphql';
 import Account from './Account';
 
-@Entity('auth')
+@Table({ tableName: 'auth' })
 @ObjectType()
-export default class Auth extends BaseEntity {
-  @PrimaryGeneratedColumn('increment')
+export default class Auth extends Model {
+  @AutoIncrement
+  @PrimaryKey
   @Field(() => ID)
-  id: string;
+  @Column
+  id: number;
 
-  @ManyToOne(() => Account)
-  @JoinColumn([{ name: 'account_id', referencedColumnName: 'id' }])
+  @BelongsTo(() => Account)
   account: Account;
 
+  @ForeignKey(() => Account)
+  @Column({ type: DataType.UUID })
+  accountId: string;
+
   @Field()
-  @Column()
+  @Column
   provider: 'local';
 
   @Field()
-  @Column()
+  @Column
   providerId: string;
 
   @Field()
-  @Column()
+  @Column
   token: string;
 
   static hashPassword(password: string) {

@@ -1,17 +1,14 @@
+import { Column, DataType, HasOne, Model, Table } from 'sequelize-typescript';
 import { Field, ID, ObjectType } from 'type-graphql';
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
 import Address from './Address';
 
-@Entity('account')
+@Table({ tableName: 'accounts' })
 @ObjectType()
-export default class Account extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
+export default class Account extends Model {
+  @Column({
+    primaryKey: true,
+    type: DataType.UUID,
+  })
   @Field(() => ID)
   id: string;
 
@@ -21,6 +18,6 @@ export default class Account extends BaseEntity {
   @Column('float')
   unconfirmed: number = 0;
 
-  @OneToOne(() => Address, (addr) => addr.account)
+  @HasOne(() => Address)
   address: Address;
 }

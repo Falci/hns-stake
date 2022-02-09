@@ -30,7 +30,7 @@ export class AuthResolver {
   async login(@Arg('email') email: string, @Arg('password') password: string) {
     const auth = await Auth.findOne({
       where: { provider: 'local', providerId: email },
-      relations: ['account'],
+      include: Account,
     });
 
     if (!auth || !(await auth.validatePassword(password))) {

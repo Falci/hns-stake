@@ -1,24 +1,27 @@
-import { createConnection } from 'typeorm';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import Auth from 'models/Auth';
-import Account from 'models/Account';
-import Address from 'models/Address';
-import Settings from 'models/Settings';
-import TxMaturing from 'models/TxMaturing';
-import Tx from 'models/Tx';
-import { TxMaturingSubsscriber } from 'subscribers/TxMaturingSubscriber';
+import { Sequelize } from 'sequelize-typescript';
 
-export default createConnection({
-  namingStrategy: new SnakeNamingStrategy(),
-  name: 'default',
-  type: process.env.TYPEORM_CONNECTION as any,
-  host: process.env.TYPEORM_HOST as string,
-  port: parseInt(process.env.TYPEORM_PORT as string),
-  username: process.env.TYPEORM_USERNAME as string,
-  password: process.env.TYPEORM_PASSWORD as string,
-  database: process.env.TYPEORM_DATABASE as string,
-  entities: [Account, Auth, Address, TxMaturing, Tx, Settings],
-  subscribers: [TxMaturingSubsscriber],
-  synchronize: process.env.NODE_ENV !== 'production',
+export const sequelize = new Sequelize(process.env.DATABASE_URL!, {
   logging: false,
-}).then(() => console.log('💾 Connected to database!'));
+  models: [__dirname + '/../models'],
+});
+
+let connected = false;
+const connect = async () => {
+  if (!connected) {
+    try {
+      await sequelize.authenticate();
+      console.log('💾 Database connected.');
+      connected = true;
+
+      if (process.env.NODE_ENV !== 'production') {
+        sequelize.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
+      }
+    } catch (error) {
+      console.error('Unable to connect to the database:', error);
+    }
+  }
+
+  return sequelize;
+};
+
+export default connect;

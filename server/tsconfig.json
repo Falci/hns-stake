@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es6", // or a more recent ecmascript version
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "module": "commonjs",
     "rootDir": ".",
     "typeRoots": ["node_modules/@types", "src/@types"],
-    "resolveJsonModule": true,
     "outDir": "./dist",
     "removeComments": true,
     "esModuleInterop": true,
@@ -12,8 +13,7 @@
     "strict": true,
     "skipLibCheck": true,
     "baseUrl": "./src",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false
-  }
+  },
+  "lib": ["es2015"]
 }

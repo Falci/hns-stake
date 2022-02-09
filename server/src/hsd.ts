@@ -13,7 +13,7 @@ import conn from 'db/connect';
 const debug = Debug('server:ws');
 
 (async () => {
-  await conn;
+  await conn();
   await client.open().then(() => console.log('🤝 Connected to Handshake Node'));
   return () => client.close();
 })();

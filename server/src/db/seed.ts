@@ -9,37 +9,41 @@ import Tx from 'models/Tx';
 import TxMaturing from 'models/TxMaturing';
 
 (async () => {
-  await conn;
+  const sequelize = await conn();
+
+  await sequelize.sync({ force: true });
 
   console.log('Cleaning db...');
-  await TxMaturing.delete({});
-  await Tx.delete({});
-  await Address.delete({});
-  await Auth.delete({});
-  await Account.delete({});
+  await TxMaturing.destroy({ where: {} });
+  await Tx.destroy({ where: {} });
+  await Address.destroy({ where: {} });
+  await Auth.destroy({ where: {} });
+  await Account.destroy({ where: {} });
+
+  await Auth.sync({ force: true });
 
   console.log('Settings');
   await Settings.setCurrentHeight(0);
 
   console.log('Account');
-  const account = new Account();
-  account.id = '1872dd7c-ebe0-4367-b07a-eb7903eb1b0e';
-  await account.save();
+  const account = await Account.create({
+    id: '1872dd7c-ebe0-4367-b07a-eb7903eb1b0e',
+  });
 
   console.log('Auth');
-  const auth = new Auth();
-  auth.account = account;
-  auth.provider = 'local';
-  auth.providerId = 'director@handshake.org';
-  auth.token = Auth.hashPassword('123123123');
-  await auth.save();
+  await Auth.create({
+    accountId: account.id,
+    provider: 'local',
+    providerId: 'director@handshake.org',
+    token: Auth.hashPassword('123123123'),
+  });
 
   console.log('Address');
-  const address = new Address();
-  address.account = account;
-  address.address = 'rs1qllc026n0y7xdj5sy62quswrwg3wnn6ksu9xqxq';
-  address.index = 1;
-  await address.save();
+  await Address.create({
+    accountId: account.id,
+    index: 1,
+    address: 'rs1qllc026n0y7xdj5sy62quswrwg3wnn6ksu9xqxq',
+  });
 
   console.log('Done!');
 })().catch((e) =>

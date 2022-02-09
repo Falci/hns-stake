@@ -1,15 +1,15 @@
+import { Column, Model, Table } from 'sequelize-typescript';
 import { Field, ID, ObjectType } from 'type-graphql';
-import { BaseEntity, Column, Entity } from 'typeorm';
 
-@Entity('settings')
+@Table({ tableName: 'settings' })
 @ObjectType()
-export default class Settings extends BaseEntity {
+export default class Settings extends Model {
   @Field(() => ID)
-  @Column({ primary: true, type: 'varchar' })
+  @Column({ primaryKey: true })
   id: string;
 
   @Field()
-  @Column()
+  @Column
   value: string;
 
   private static Key = {
@@ -29,9 +29,9 @@ export default class Settings extends BaseEntity {
   }
 
   static async setCurrentHeight(height: number) {
-    return await Settings.upsert(
-      { id: Settings.Key.CURRENT_HEIGHT, value: String(height) },
-      ['id']
-    );
+    return await Settings.upsert({
+      id: Settings.Key.CURRENT_HEIGHT,
+      value: String(height),
+    });
   }
 }

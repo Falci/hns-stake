@@ -26,10 +26,15 @@ export class WalletResolver {
   @Authorized()
   @Query(() => Wallet)
   async wallet(@Ctx('auth') { id }: Account) {
-    const account = await Account.createQueryBuilder('account')
-      .where('account.id=:id', { id })
-      .leftJoinAndMapOne('account.address', Address, 'addr', 'addr.used=false')
-      .getOne();
+    const account = await Account.findOne({
+      where: { id },
+      include: {
+        required: false,
+        model: Address,
+        attributes: ['address'],
+        where: { used: false },
+      },
+    });
 
     if (!account) {
       throw new Error('Account not found');

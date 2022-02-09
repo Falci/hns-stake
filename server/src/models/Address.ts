@@ -1,47 +1,50 @@
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { generateAddress } from 'service/hsd';
 import { Field, ObjectType } from 'type-graphql';
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryColumn,
-} from 'typeorm';
 import Account from './Account';
-import TxMaturing from './TxMaturing';
 
-@Entity('address')
+@Table({ tableName: 'addresses' })
 @ObjectType()
-export default class Address extends BaseEntity {
+export default class Address extends Model {
   @Field()
-  @PrimaryColumn()
+  @Column({ primaryKey: true })
   address: string;
 
   @Column('int4')
   index: number;
 
   @Field(() => Account)
-  @ManyToOne(() => Account, (acc) => acc.address)
+  @BelongsTo(() => Account)
   account: Account;
 
+  @ForeignKey(() => Account)
+  @Column({ type: DataType.UUID })
+  accountId: string;
+
   @Field()
-  @Column()
+  @Column
   used: boolean = false;
 
-  @OneToMany(() => TxMaturing, (tx) => tx.address)
-  maturing: TxMaturing[];
-
   static async generateNext(account: Account): Promise<Address> {
-    const lastAddr = await Address.findOne({ order: { index: 'DESC' } });
+    const lastAddr = await Address.findOne({
+      order: [['index', 'DESC']],
+      attributes: ['index'],
+    });
     const nextIndex = (lastAddr?.index || 0) + 1;
 
-    const addr = Address.create({
-      account,
+    console.log({ lastAddr, nextIndex });
+
+    return await Address.create({
+      accountId: account.id,
       index: nextIndex,
       address: generateAddress(nextIndex),
     });
-
-    return await addr.save();
   }
 }

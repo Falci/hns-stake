@@ -1,15 +1,18 @@
+import Sequelize, { Op } from 'sequelize';
 import {
-  BaseEntity,
+  AfterCreate,
+  AfterDestroy,
+  BelongsTo,
   Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  LessThanOrEqual,
-  ManyToOne,
-  MoreThan,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+  CreatedAt,
+  DataType,
+  Default,
+  ForeignKey,
+  Min,
+  Model,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript';
 import Address from './Address';
 import Tx from './Tx';
 
@@ -17,48 +20,89 @@ import Tx from './Tx';
  * This is a confirmed TX to an address in our database.
  * These entities lives while the TX has too low confirmations and could be affected by a reorg.
  */
-@Entity('tx_maturing')
-export default class TxMaturing extends BaseEntity {
-  @PrimaryColumn('char', { length: 64 })
+@Table({ tableName: 'tx_maturing' })
+export default class TxMaturing extends Model {
+  @Column({ type: DataType.CHAR(64), primaryKey: true })
   tx: string;
 
-  @PrimaryColumn()
+  @Column({ primaryKey: true })
   index: number;
 
-  @ManyToOne(() => Address, (addr) => addr.maturing)
-  @JoinColumn({ name: 'address' })
+  @BelongsTo(() => Address)
   address: Address;
 
+  @ForeignKey(() => Address)
+  @Column
+  addressId: string;
+
+  @Min(0.000001)
   @Column('float4')
   value: number;
 
-  @Column({ default: -1 })
+  @Default(-1)
+  @Column
   height: number;
 
-  @Column({ default: -1 })
+  @Default(-1)
+  @Column
   goodAfter: number;
 
-  @CreateDateColumn()
+  @CreatedAt
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdatedAt
   updatedAt: Date;
 
+  @AfterCreate
+  @AfterDestroy
+  static async updateUnconfirmedBalance(tx: TxMaturing) {
+    const address = await tx.$get('address');
+    if (!address?.used) {
+      address?.update({ used: true });
+    }
+
+    const { unconfirmed } = (await TxMaturing.findOne({
+      attributes: [
+        [Sequelize.fn('sum', Sequelize.col('value')), 'unconfirmed'],
+      ],
+      raw: true,
+      include: {
+        model: Address,
+        attributes: [],
+        where: { accountId: address!.accountId },
+      },
+    })) as unknown as { unconfirmed: number };
+
+    const account = await address?.$get('account');
+    account!.update({ unconfirmed });
+  }
+
   static async mature(height: number) {
-    const mature = await TxMaturing.find({
-      where: { goodAfter: LessThanOrEqual(height), height: MoreThan(-1) },
-      relations: ['address'],
+    const mature = await TxMaturing.findAll({
+      where: {
+        goodAfter: {
+          [Op.lte]: height,
+        },
+        height: {
+          [Op.gt]: -1,
+        },
+      },
     });
 
-    mature.forEach(async (tx) => {
-      await Tx.create({
-        tx: tx.tx,
-        index: tx.index,
-        address: tx.address,
-        value: tx.value,
-        height: tx.height,
-      }).save();
-      await tx.remove();
+    mature.forEach(async (txMaturing) => {
+      txMaturing.sequelize.transaction(async (transaction) => {
+        await Tx.create(
+          {
+            tx: txMaturing.tx,
+            index: txMaturing.index,
+            addressId: txMaturing.addressId,
+            value: txMaturing.value,
+            height: txMaturing.height,
+          },
+          { transaction }
+        );
+        await txMaturing.destroy({ transaction });
+      });
     });
   }
 }

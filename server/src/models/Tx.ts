@@ -1,51 +1,65 @@
 import {
-  AfterInsert,
-  AfterRemove,
-  BaseEntity,
+  AfterCreate,
+  BelongsTo,
   Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  MoreThanOrEqual,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+  CreatedAt,
+  DataType,
+  Default,
+  ForeignKey,
+  Min,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import Account from './Account';
 import Address from './Address';
 
 /**
  * This is a confirmed TX after the maturing period (unlikely to sofer reorg)
  */
-@Entity('tx')
-export default class Tx extends BaseEntity {
-  @PrimaryColumn('char', { length: 64 })
+@Table({ tableName: 'tx' })
+export default class Tx extends Model {
+  @Column({ type: DataType.CHAR(64), primaryKey: true })
   tx: string;
 
-  @PrimaryColumn()
+  @Column({ primaryKey: true })
   index: number;
 
-  @ManyToOne(() => Address, (addr) => addr.maturing)
-  @JoinColumn({ name: 'address' })
+  @BelongsTo(() => Address)
   address: Address;
 
+  @ForeignKey(() => Address)
+  @Column({ allowNull: false })
+  addressId: string;
+
+  @Min(0.000001)
   @Column('float4')
   value: number;
 
-  @Column({ default: -1 })
+  @Default(-1)
+  @Column
   height: number;
 
-  @CreateDateColumn()
+  @CreatedAt
   createdAt: Date;
 
-  @AfterInsert()
-  async updateUnconfirmedBalance() {
-    // find the account by the addr
-    const { account } = await Address.findOneOrFail({
-      where: { address: this.address.address },
-      relations: ['account'],
+  @AfterCreate
+  static async updateBalance(tx: Tx) {
+    const account = await Account.findOne({
+      include: {
+        model: Address,
+        attributes: [],
+        where: { address: tx.addressId },
+      },
     });
 
-    account.balance += this.value;
-    await account.save();
+    return await account?.increment('balance', { by: tx.value });
+  }
+
+  @AfterCreate
+  static async markAddressAsUsed(tx: Tx) {
+    const address = await tx.$get('address');
+    if (!address?.used) {
+      await address?.update({ used: true });
+    }
   }
 }

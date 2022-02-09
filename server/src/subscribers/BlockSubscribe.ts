@@ -27,33 +27,23 @@ export class BlockSubscribe {
 
     // All addresses that we care
     const ourAddrs = (
-      await Address.createQueryBuilder('addr')
-        .where('addr.address IN (:...addresses)', { addresses })
-        .getMany()
-    ).reduce(
-      (map, item) => ({
-        ...map,
-        [item.address]: item,
-      }),
-      {}
-    ) as { [addr: string]: Address };
-
-    const ourAddrsPlain = Object.keys(ourAddrs);
+      await Address.findAll({
+        where: { address: addresses },
+        attributes: ['address'],
+      })
+    ).map(({ address }) => address);
 
     transfers
       // get the transfer to us
-      .filter(({ address }) => ourAddrsPlain.includes(address))
+      .filter(({ address }) => ourAddrs.includes(address))
       // save in `tx_maturing`
       .forEach((output) => {
-        TxMaturing.upsert(
-          {
-            ...output,
-            address: ourAddrs[output.address],
-            height: block.height,
-            goodAfter: block.height + 10, // TODO: create a better rule or use config
-          },
-          ['tx', 'index']
-        );
+        TxMaturing.upsert({
+          ...output,
+          addressId: output.address,
+          height: block.height,
+          goodAfter: block.height + 2, // TODO: create a better rule or use config
+        });
       });
   }
 }
