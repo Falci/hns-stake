@@ -72,7 +72,18 @@ class TX {
   outputs: Output[];
   locktime: number;
 
-  toJSON(): object;
+  toJSON(): {
+    hash: string;
+    outputs: {
+      address: string;
+      covenant: {
+        action: string;
+        items: any[];
+        type: number;
+      };
+      value: number;
+    }[];
+  };
 
   static fromRaw(raw: Buffer): TX;
 }
@@ -102,6 +113,11 @@ declare module 'hs-client' {
     on(event: string, callback: (e?: any) => void): void;
     setFilter(filter: Buffer);
     execute(method: string, params?: any);
+    getInfo(): Promise<{
+      chain: {
+        height: number;
+      };
+    }>;
   }
 }
 

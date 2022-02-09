@@ -8,11 +8,11 @@
   },
   "scripts": {
     "start": "ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only --ignore-watch node_modules --no-notify src/server.ts",
-    "start:ws": "DEBUG=server:ws ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only --ignore-watch node_modules --no-notify src/hsd.ts",
+    "start:ws": "DEBUG=server:ws ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only --ignore-watch node_modules --no-notify src/queue/producer.ts",
     "build": "babel src --extensions \".ts\" --out-dir dist --copy-files --no-copy-ignored",
     "test": "jest",
-    "typeorm": "ts-node node_modules/typeorm/cli.js",
     "docker:db:start": "docker run -d --name hns-stake-db -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=hns-stake -p 5432:5432 postgres:10.15",
+    "docker:redis:start": "docker run -d --name hns-stake-redis -p 6379:6379 redis:6.2-alpine",
     "docker:hsd:start": "docker run --name hsd -p 14037:14037 -p 14038:14038 -p 14039:14039 sinpapeles/hsd:2.4.0 --network regtest --http-host 0.0.0.0 --api-key=api-key --wallet-http-host=0.0.0.0 --listen",
     "db:seed": "NODE_PATH=./src ts-node -r dotenv/config src/db/seed.ts"
   },
@@ -23,6 +23,7 @@
     "@babel/preset-env": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
     "@types/body-parser": "^1.19.2",
+    "@types/bull": "^3.15.7",
     "@types/debug": "^4.1.7",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.0",
@@ -43,10 +44,13 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "@bull-board/api": "^3.9.4",
+    "@bull-board/express": "^3.9.4",
     "apollo-server-core": "^3.6.2",
     "apollo-server-express": "^3.6.2",
     "bfilter": "^1.0.5",
     "body-parser": "^1.19.1",
+    "bull": "^4.5.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "debug": "^4.3.3",

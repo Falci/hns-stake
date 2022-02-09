@@ -33,3 +33,11 @@ export const generateAddress = (index: number) => {
 
   return Address.fromPubkey(publicKey).toString(network);
 };
+
+export const getCurrentHeight = () =>
+  client.getInfo().then((info) => info.chain.height);
+
+export const getBlock = async (height: number) => {
+  const options = [height, 1, 1];
+  return client.execute('getblockbyheight', options);
+};
