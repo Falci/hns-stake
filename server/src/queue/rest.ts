@@ -3,12 +3,12 @@ import { createBullBoard } from '@bull-board/api';
 import { BullAdapter } from '@bull-board/api/bullAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 
-import { mempoolQ, blockQ } from './queue';
+import { queue } from './queue';
 
 const serverAdapter = new ExpressAdapter();
 
 createBullBoard({
-  queues: [new BullAdapter(blockQ), new BullAdapter(mempoolQ)],
+  queues: [new BullAdapter(queue)],
   serverAdapter: serverAdapter,
 });
 

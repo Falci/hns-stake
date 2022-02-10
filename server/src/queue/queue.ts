@@ -1,10 +1,9 @@
 import Queue from 'bull';
 
-export const mempoolQ = new Queue('mempool');
-export const blockQ = new Queue('block');
+export const queue = new Queue('hsd');
 console.log('🐂 Queue initialized');
 
-const { client } = blockQ;
+const { client } = queue;
 const LAST_HEIGHT = 'lastHeight';
 
 export const getLastHeight = async () =>

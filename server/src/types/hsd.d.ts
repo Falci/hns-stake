@@ -26,7 +26,7 @@ class Block {
         type: number;
       };
       value: number;
-      n: number;
+      n?: number;
     }[];
   }[];
   static fromRaw(raw: Buufer): Block;
@@ -72,20 +72,21 @@ class TX {
   outputs: Output[];
   locktime: number;
 
-  toJSON(): {
-    hash: string;
-    outputs: {
-      address: string;
-      covenant: {
-        action: string;
-        items: any[];
-        type: number;
-      };
-      value: number;
-    }[];
-  };
+  toJSON(): TXJSON;
 
   static fromRaw(raw: Buffer): TX;
+}
+interface TXJSON {
+  hash: string;
+  outputs: {
+    address: string;
+    covenant: {
+      action: string;
+      items: any[];
+      type: number;
+    };
+    value: number;
+  }[];
 }
 
 class Network {

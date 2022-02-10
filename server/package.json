@@ -7,8 +7,10 @@
     "node": ">=14.8.0"
   },
   "scripts": {
-    "start": "ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only --ignore-watch node_modules --no-notify src/server.ts",
-    "start:ws": "DEBUG=server:ws ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only --ignore-watch node_modules --no-notify src/queue/producer.ts",
+    "ts": "ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only --ignore-watch node_modules --no-notify",
+    "start": "yarn ts src/server.ts",
+    "start:producer": "yarn ts src/queue/producer.ts",
+    "start:consumer": "yarn ts src/queue/consumer.ts",
     "build": "babel src --extensions \".ts\" --out-dir dist --copy-files --no-copy-ignored",
     "test": "jest",
     "docker:db:start": "docker run -d --name hns-stake-db -e POSTGRES_PASSWORD=docker -e POSTGRES_DB=hns-stake -p 5432:5432 postgres:10.15",
